@@ -5,6 +5,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config()
+const multer = require('multer');
+const upload = require('../multer/multer');
+const uploadFile = require("../cloud/cloudinary")
 
 //getting all users
 router.get("/", async (req, res) => {
@@ -25,14 +28,16 @@ router.get("/:id", getUser, async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/",upload.single("image"), async (req, res) => {
 
   try {
+    const result = await uploadFile(req.file, res);
     const user = await User.findOne({ email: req.body.email });
     if(user){
       return res.status(400).json({
         status: "failed",
-        message: "user with this email already exist"
+        message: "user with this email already exist",
+        
       })
     }
     // const salt = await bcrypt.genSalt(10);
@@ -41,7 +46,8 @@ router.post("/", async (req, res) => {
     const newUser = await User.create({
       name: req.body.name,
       email: req.body.email,
-      password: req.body.password
+      password: req.body.password,
+      image: result.secure_url
     });
     console.log(req.body);
     return res.status(201).json({ status: "success", newUser });

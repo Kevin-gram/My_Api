@@ -4,11 +4,13 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 dotenv.config()
+const uploadRouter = require('./routes/users');
 
-app.use(bodyParser.urlencoded({ extended: false}))
+app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
 const  usersRouter = require('./routes/users');
+const upload = require('./multer/multer');
 mongoose.connect(process.env.Database_Url)
   .then(() => console.log('DB Connected!'))
   .catch(err => console.log(err));
